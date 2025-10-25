@@ -1,7 +1,7 @@
 // ============================================
 // PRELOAD.JS - Безпечний міст між процесами
 // ============================================
-// Версія: v0.6.0 - Security Fix
+// Версія: v0.7.0 - Google Docs/Sheets
 // Призначення: Експонує безпечні API для renderer
 // ============================================
 
@@ -17,29 +17,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AUDIT OPERATIONS
   // ============================================
   
-  /**
-   * Почати SEO аудит
-   * @param {string} url - URL сайту
-   * @param {object} options - Налаштування (depth, checks)
-   * @returns {Promise<object>} Результат аудиту
-   */
   startAudit: (url, options) => {
     return ipcRenderer.invoke('start-audit', url, options);
   },
 
-  /**
-   * Зупинити поточний аудит
-   * @returns {Promise<object>} Статус зупинки
-   */
   stopAudit: () => {
     return ipcRenderer.invoke('stop-audit');
   },
 
-  /**
-   * Валідувати URL перед аудитом
-   * @param {string} url - URL для перевірки
-   * @returns {Promise<object>} Результат валідації
-   */
   validateUrl: (url) => {
     return ipcRenderer.invoke('validate-url', url);
   },
@@ -48,19 +33,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // PROGRESS EVENTS
   // ============================================
   
-  /**
-   * Підписатися на прогрес аудиту
-   * @param {function} callback - Функція для обробки прогресу
-   */
   onProgress: (callback) => {
     ipcRenderer.on('audit-progress', (event, data) => {
       callback(data);
     });
   },
 
-  /**
-   * Відписатися від прогресу
-   */
   removeProgressListener: () => {
     ipcRenderer.removeAllListeners('audit-progress');
   },
@@ -69,61 +47,61 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // REPORT OPERATIONS
   // ============================================
   
-  /**
-   * Відкрити текстовий звіт в системному редакторі
-   * @param {string} filename - Ім'я файлу звіту
-   * @returns {Promise<object>} Результат відкриття
-   */
   openReport: (filename) => {
     return ipcRenderer.invoke('open-report', filename);
   },
 
-  /**
-   * Відкрити папку зі звітами
-   * @returns {Promise<object>} Результат відкриття
-   */
   openReportsFolder: () => {
     return ipcRenderer.invoke('open-reports-folder');
   },
 
-  /**
-   * Експортувати звіт в Excel
-   * @param {object} auditData - Дані аудиту
-   * @param {string} filename - Ім'я файлу (опціонально)
-   * @returns {Promise<object>} Результат експорту
-   */
   exportToExcel: (auditData, filename) => {
     return ipcRenderer.invoke('export-to-excel', auditData, filename);
   },
 
-  /**
-   * Відкрити Excel файл
-   * @param {string} filename - Ім'я файлу
-   * @returns {Promise<object>} Результат відкриття
-   */
   openExcelReport: (filename) => {
     return ipcRenderer.invoke('open-report', filename);
+  },
+
+  // ============================================
+  // ✅ НОВИЙ: GOOGLE AUTH
+  // ============================================
+  
+  googleAuthStatus: () => {
+    return ipcRenderer.invoke('google-auth-status');
+  },
+
+  googleAuthLogin: () => {
+    return ipcRenderer.invoke('google-auth-login');
+  },
+
+  googleAuthLogout: () => {
+    return ipcRenderer.invoke('google-auth-logout');
+  },
+
+  // ============================================
+  // ✅ НОВИЙ: GOOGLE EXPORT
+  // ============================================
+  
+  exportGoogleSheets: (auditData) => {
+    return ipcRenderer.invoke('export-google-sheets', auditData);
+  },
+
+  exportGoogleDocs: (auditData) => {
+    return ipcRenderer.invoke('export-google-docs', auditData);
   },
 
   // ============================================
   // TESTING & INFO
   // ============================================
   
-  /**
-   * Тестове з'єднання з main process
-   * @returns {Promise<object>} Інформація про з'єднання
-   */
   testConnection: () => {
     return ipcRenderer.invoke('test-connection');
   },
 
-  /**
-   * Отримати версію програми
-   * @returns {Promise<string>} Версія
-   */
   getVersion: () => {
     return ipcRenderer.invoke('get-version');
   }
 });
 
-console.log('✅ Preload script завантажено (v0.6.0 - Security)');
+console.log('✅ Preload script завантажено (v0.7.0 - Google Docs/Sheets)');

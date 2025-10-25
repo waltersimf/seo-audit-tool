@@ -1,8 +1,8 @@
 // ============================================
 // MAIN.JS - Головний процес Electron
 // ============================================
-// Версія: v0.6.0 - Security + Excel - BUGFIX
-// Зміни: ВИПРАВЛЕНО шлях до issues!
+// Версія: v0.7.0 - Google Docs/Sheets Export
+// Зміни: Додано Google OAuth + Docs + Sheets
 // ============================================
 
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
@@ -11,6 +11,11 @@ const fs = require('fs').promises;
 const { WebCrawler } = require('./crawler');
 const HTMLAnalyzer = require('./analyzer');
 const ExcelExporter = require('./excel-exporter');
+
+// ✅ НОВИЙ: Google інтеграція
+const { GoogleAuth } = require('./google-auth');
+const { GoogleSheetsExporter } = require('./google-sheets');
+const { GoogleDocsGenerator } = require('./google-docs');
 
 // ============================================
 // ВЕРСІЯ - Єдине джерело правди
@@ -23,6 +28,7 @@ const { version } = require('../../package.json');
 
 let mainWindow = null;
 let activeCrawler = null;  // Поточний активний crawler
+let googleAuth = null;     // ✅ НОВИЙ: Google Auth instance
 
 // ============================================
 // СТВОРЕННЯ ГОЛОВНОГО ВІКНА
@@ -74,6 +80,7 @@ function createMainWindow() {
 app.on('ready', () => {
   console.log(`🚀 SEO Audit Tool v${version} запускається...`);
   console.log(`🔐 Security: contextIsolation=true, nodeIntegration=false`);
+  console.log(`☁️ Google Docs/Sheets integration enabled`);
   createMainWindow();
 });
 
@@ -104,7 +111,6 @@ ipcMain.handle('test-connection', async () => {
   };
 });
 
-// ✅ ДОДАЙ ЦЕ:
 /**
  * Handler для отримання версії
  */
@@ -219,46 +225,43 @@ ipcMain.handle('start-audit', async (event, url, options = {}) => {
     // ========================================
     console.log('📄 Крок 3/3: Генерація звіту...');
 
-    const report = await analyzer.generateTextReport();
-    console.log(`✅ Звіт збережено: ${report.filename}`);
+    // Відправляємо прогрес генерації звіту
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('audit-progress', {
+        step: 'generating',
+        current: 100,
+        total: 100,
+        percent: 100,
+        currentUrl: 'Генерація звіту...'
+      });
+    }
 
-    // ========================================
-    // РЕЗУЛЬТАТ
-    // ========================================
+    const reportFilename = await analyzer.generateTextReport(crawlResult.stats);
+    console.log(`✅ Звіт створено: ${reportFilename}`);
 
     // Закриваємо crawler
     await activeCrawler.close();
     activeCrawler = null;
 
-    // ✅✅✅ КРИТИЧНО ВАЖЛИВО - ПРАВИЛЬНА СТРУКТУРА ДАНИХ:
+    // ========================================
+    // ПОВЕРНЕННЯ РЕЗУЛЬТАТІВ
+    // ========================================
+    
     return {
       success: true,
-      message: `Аудит завершено! Бал: ${analysisResult.summary.score}/100`,
-      data: {
-        baseUrl: crawlResult.stats.baseUrl,
-        score: analysisResult.summary.score,
-        totalPages: crawlResult.stats.visitedPages,
-        
-        // Метрики з summary
-        passedChecks: analysisResult.summary.passedChecks,
-        failedChecks: analysisResult.summary.failedChecks,
-        criticalIssues: analysisResult.summary.criticalIssues,
-        highIssues: analysisResult.summary.highIssues,
-        mediumIssues: analysisResult.summary.mediumIssues,
-        lowIssues: analysisResult.summary.lowIssues,
-        
-        // ✅ ВИПРАВЛЕНО: Дані для UI та Excel
-        checks: analysisResult.checks,        // ✅ Правильно
-        issues: analysisResult.issues,        // ✅✅✅ НЕ analysisResult.report.issues!
-        pages: crawlResult.results,           // ✅ Для Excel експорту
-        reportFile: report.filename
-      }
+      report: analysisResult.report,
+      summary: analysisResult.summary,
+      issues: analysisResult.issues,  // ✅ BUGFIX v0.6.0
+      pages: crawlResult.results,
+      stats: crawlResult.stats,
+      reportFilename: reportFilename,
+      baseUrl: crawlResult.stats.baseUrl
     };
 
   } catch (error) {
     console.error('❌ Помилка аудиту:', error);
-
-    // Закриваємо crawler якщо помилка
+    
+    // Закриваємо crawler у разі помилки
     if (activeCrawler) {
       await activeCrawler.close();
       activeCrawler = null;
@@ -266,7 +269,8 @@ ipcMain.handle('start-audit', async (event, url, options = {}) => {
 
     return {
       success: false,
-      error: error.message
+      error: error.message,
+      stack: error.stack
     };
   }
 });
@@ -282,13 +286,17 @@ ipcMain.handle('stop-audit', async () => {
       activeCrawler.stop();
       await activeCrawler.close();
       activeCrawler = null;
-      console.log('✅ Краулер зупинено');
-      return { success: true, message: 'Аудит зупинено' };
+      console.log('✅ Аудит зупинено');
+      return { success: true };
+    } else {
+      return { success: false, error: 'Немає активного аудиту' };
     }
-    return { success: false, message: 'Аудит не запущено' };
   } catch (error) {
     console.error('❌ Помилка зупинки:', error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error.message
+    };
   }
 });
 
@@ -339,7 +347,7 @@ ipcMain.handle('open-reports-folder', async () => {
 });
 
 /**
- * ✅ НОВИЙ: Handler для експорту в Excel
+ * Handler для експорту в Excel
  */
 ipcMain.handle('export-to-excel', async (event, auditData, filename) => {
   console.log('📊 Експорт в Excel...');
@@ -378,6 +386,165 @@ ipcMain.handle('export-to-excel', async (event, auditData, filename) => {
 });
 
 // ============================================
+// ✅ НОВИЙ: GOOGLE AUTH HANDLERS
+// ============================================
+
+/**
+ * Перевірити статус Google авторизації
+ */
+ipcMain.handle('google-auth-status', async () => {
+  try {
+    if (!googleAuth) {
+      googleAuth = new GoogleAuth();
+      await googleAuth.initialize();
+    }
+    
+    const isAuthorized = googleAuth.isAuthorized();
+    
+    if (isAuthorized) {
+      const userInfo = await googleAuth.getUserInfo();
+      return {
+        isAuthorized: true,
+        user: userInfo
+      };
+    }
+    
+    return { isAuthorized: false };
+  } catch (error) {
+    console.error('❌ Помилка перевірки статусу:', error.message);
+    return { isAuthorized: false, error: error.message };
+  }
+});
+
+/**
+ * Авторизуватися в Google
+ */
+ipcMain.handle('google-auth-login', async () => {
+  try {
+    if (!googleAuth) {
+      googleAuth = new GoogleAuth();
+      await googleAuth.initialize();
+    }
+    
+    await googleAuth.authorize();
+    const userInfo = await googleAuth.getUserInfo();
+    
+    return {
+      success: true,
+      user: userInfo
+    };
+  } catch (error) {
+    console.error('❌ Помилка авторизації:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+/**
+ * Вийти з Google Account
+ */
+ipcMain.handle('google-auth-logout', async () => {
+  try {
+    if (!googleAuth) {
+      return { success: true };
+    }
+    
+    await googleAuth.logout();
+    googleAuth = null;
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Помилка виходу:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// ============================================
+// ✅ НОВИЙ: GOOGLE SHEETS EXPORT
+// ============================================
+
+/**
+ * Експортувати аудит в Google Sheets
+ */
+ipcMain.handle('export-google-sheets', async (event, auditData) => {
+  try {
+    // Перевірити авторизацію
+    if (!googleAuth || !googleAuth.isAuthorized()) {
+      return {
+        success: false,
+        error: 'Потрібна авторизація. Натисніть "Підключити Google Account"'
+      };
+    }
+    
+    console.log('📊 Експорт в Google Sheets...');
+    
+    // Отримати OAuth клієнта
+    const auth = await googleAuth.getClient();
+    
+    // Створити експортер
+    const exporter = new GoogleSheetsExporter(auth);
+    
+    // Створити таблицю
+    const result = await exporter.createAuditSpreadsheet(auditData);
+    
+    console.log(`✅ Google Sheets створено: ${result.url}`);
+    
+    return result;
+  } catch (error) {
+    console.error('❌ Помилка експорту в Google Sheets:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// ============================================
+// ✅ НОВИЙ: GOOGLE DOCS EXPORT
+// ============================================
+
+/**
+ * Експортувати аудит в Google Docs
+ */
+ipcMain.handle('export-google-docs', async (event, auditData) => {
+  try {
+    // Перевірити авторизацію
+    if (!googleAuth || !googleAuth.isAuthorized()) {
+      return {
+        success: false,
+        error: 'Потрібна авторизація. Натисніть "Підключити Google Account"'
+      };
+    }
+    
+    console.log('📄 Експорт в Google Docs...');
+    
+    // Отримати OAuth клієнта
+    const auth = await googleAuth.getClient();
+    
+    // Створити генератор
+    const generator = new GoogleDocsGenerator(auth);
+    
+    // Створити документ
+    const result = await generator.createAuditDocument(auditData);
+    
+    console.log(`✅ Google Docs створено: ${result.url}`);
+    
+    return result;
+  } catch (error) {
+    console.error('❌ Помилка експорту в Google Docs:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
+// ============================================
 // ГЛОБАЛЬНА ОБРОБКА ПОМИЛОК
 // ============================================
 
@@ -391,3 +558,4 @@ process.on('unhandledRejection', (error) => {
 
 console.log(`✅ Main process готовий до роботи (v${version})`);
 console.log(`🔐 Security enabled: contextIsolation + preload.js`);
+console.log(`☁️ Google Docs/Sheets integration ready`);
