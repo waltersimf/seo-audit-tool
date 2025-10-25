@@ -1,0 +1,59 @@
+{
+  "name": "seo-audit-tool",
+  "version": "0.6.0",
+  "description": "Professional desktop SEO audit tool",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "seo",
+    "audit",
+    "crawler",
+    "electron"
+  ],
+  "author": "Volodymyr Kompaniets",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
+    "exceljs": "^4.4.0",
+    "puppeteer": "^23.0.0"
+  },
+  "build": {
+    "appId": "com.seoaudit.tool",
+    "productName": "SEO Audit Tool",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "public/icon.png"
+    }
+  }
+}

@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Audit Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .version {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .depth-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .depth-card {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .depth-card:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .depth-card input[type="radio"] {
+            display: none;
+        }
+
+        /* ✅ ВИПРАВЛЕННЯ: Чітке виділення обраної картки */
+        .depth-card.selected {
+            border-color: #667eea;
+            background: #e8ecff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .depth-card.selected .card-title {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .depth-card.selected .card-icon {
+            transform: scale(1.1);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .card-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .custom-depth {
+            margin-top: 15px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .custom-depth.active {
+            border-color: #667eea;
+            background: #e8ecff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .custom-depth label {
+            margin-bottom: 10px;
+        }
+
+        .custom-depth-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-depth-input input {
+            flex: 1;
+        }
+
+        .custom-depth-input span {
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .info-box p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkbox-item:hover {
+            background: #e8ecff;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            display: none;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .current-url {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .score-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .score-fair {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .score-poor {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .checks-list {
+            margin-top: 20px;
+        }
+
+        .check-item {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .check-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .check-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .check-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-passed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .check-details {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .report-actions {
+            display: flex !important;
+            gap: 15px !important;
+            margin-top: 25px !important;
+        }
+
+        .btn-secondary {
+            flex: 1 !important;
+            background: #667eea !important;
+            color: white !important;
+            padding: 16px 24px !important;
+            border-radius: 10px !important;
+            border: none !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            text-align: center !important;
+        }
+
+        .btn-secondary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-excel {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-excel:hover {
+            background: #059669;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .depth-options {
+                flex-direction: column;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .report-actions {
+                flex-direction: column;
+            }
+        }
+
+        .excel-export-btn {
+            margin-top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 SEO Audit Tool</h1>
+            <p>Професійний аналіз вашого сайту</p>
+            <span class="version" id="app-version">v0.6.0</span>
+        </div>
+
+        <!-- Form -->
+        <form id="audit-form">
+            <!-- URL Input -->
+            <div class="form-group">
+                <label for="url-input">🌐 URL сайту</label>
+                <input 
+                    type="text" 
+                    id="url-input" 
+                    placeholder="https://example.com" 
+                    required
+                >
+            </div>
+
+            <!-- Depth Selection -->
+            <div class="form-group">
+                <label>📊 Глибина сканування</label>
+                <div class="depth-options">
+                    <label class="depth-card">
+                        <input type="radio" name="depth" value="100">
+                        <div class="card-content">
+                            <div class="card-icon">🚀</div>
+                            <div class="card-title">Швидкий</div>
+                            <div class="card-subtitle">100 сторінок</div>
+                        </div>
+                    </label>
+                    <label class="depth-card">
+                        <input type="radio" name="depth" value="500" checked>
+                        <div class="card-content">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-title">Базовий</div>
+                            <div class="card-subtitle">500 сторінок</div>
+                        </div>
+                    </label>
+                    <label class="depth-card">
+                        <input type="radio" name="depth" value="10000">
+                        <div class="card-content">
+                            <div class="card-icon">🔥</div>
+                            <div class="card-title">Максимум</div>
+                            <div class="card-subtitle">10,000 сторінок</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="custom-depth">
+                    <label for="custom-depth-input">або введіть своє число:</label>
+                    <div class="custom-depth-input">
+                        <input 
+                            type="number" 
+                            id="custom-depth-input" 
+                            min="10" 
+                            max="10000" 
+                            placeholder="Наприклад: 250"
+                        >
+                        <span>сторінок (10-10,000)</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <p>ℹ️ Максимум: 10,000 сторінок. Час сканування: ~40-60 хв для 10,000 сторінок.</p>
+                </div>
+            </div>
+
+            <!-- Check Types -->
+            <div class="form-group">
+                <label>🔧 Типи перевірок</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-technical" checked>
+                        <label for="check-technical">Технічний аудит</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-seo" checked>
+                        <label for="check-seo">SEO-елементи</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-speed">
+                        <label for="check-speed">⚡ Швидкість (v0.5.0+)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-backlinks">
+                        <label for="check-backlinks">🔗 Беклінки (потребує API)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn-primary" id="start-btn">
+                    🚀 Почати аудит
+                </button>
+                <button type="button" class="btn-danger" id="stop-btn">
+                    🛑 Зупинити
+                </button>
+            </div>
+        </form>
+
+        <!-- Progress -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill">0%</div>
+            </div>
+            <div class="progress-info">
+                <span id="progress-text">Підготовка...</span>
+                <span id="progress-count">0 / 0</span>
+            </div>
+            <div class="current-url" id="current-url">
+                Очікування...
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <div class="status-message" id="status-message"></div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <!-- Score Card -->
+            <div class="score-card" id="score-card">
+                <div class="score-number" id="score-number">0</div>
+                <div class="score-label">SEO Score</div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-pages">0</div>
+                    <div class="metric-label">Сторінки</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-passed">0</div>
+                    <div class="metric-label">Пройдено</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-critical">0</div>
+                    <div class="metric-label">Критичні</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-high">0</div>
+                    <div class="metric-label">Високі</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-medium">0</div>
+                    <div class="metric-label">Середні</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-low">0</div>
+                    <div class="metric-label">Низькі</div>
+                </div>
+            </div>
+
+            <!-- Checks List -->
+            <div class="checks-list" id="checks-list">
+                <!-- Заповнюється динамічно -->
+            </div>
+
+            <!-- Report Actions -->
+            <div class="report-actions">
+                <button class="btn-secondary" onclick="openReport(currentReportFile)">
+                    📄 Відкрити повний звіт (.txt)
+                </button>
+                <button class="btn-secondary btn-excel excel-export-btn" onclick="exportToExcel()">
+                    📊 Експорт в Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ЗМІННІ
+        // ============================================
+        
+        const form = document.getElementById('audit-form');
+        const urlInput = document.getElementById('url-input');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const progressCount = document.getElementById('progress-count');
+        const currentUrlDiv = document.getElementById('current-url');
+        const statusMessage = document.getElementById('status-message');
+        const resultsDiv = document.getElementById('results');
+        const checksListDiv = document.getElementById('checks-list');
+
+        const checkTechnical = document.getElementById('check-technical');
+        const checkSeo = document.getElementById('check-seo');
+        const checkSpeed = document.getElementById('check-speed');
+        const checkBacklinks = document.getElementById('check-backlinks');
+
+        let currentReportFile = '';
+        let lastAuditData = null; // ✅ Зберігаємо дані для Excel експорту
+
+        // ============================================
+        // HELPER ФУНКЦІЇ
+        // ============================================
+
+        function showProgress(data) {
+            progressContainer.style.display = 'block';
+            
+            const percent = data.percent || 0;
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = percent + '%';
+            
+            progressText.textContent = data.step === 'scanning' ? 'Сканування...' : 'Аналіз...';
+            progressCount.textContent = `${data.current} / ${data.total}`;
+            currentUrlDiv.textContent = data.currentUrl || 'Обробка...';
+        }
+
+        function hideProgress() {
+            progressContainer.style.display = 'none';
+            progressFill.style.width = '0%';
+            progressFill.textContent = '0%';
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message status-' + type;
+            statusMessage.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusMessage.style.display = 'none';
+        }
+
+        function displayResults(data) {
+            resultsDiv.style.display = 'block';
+            
+            // Score
+            const score = data.score || 0;
+            document.getElementById('score-number').textContent = score;
+            
+            const scoreCard = document.getElementById('score-card');
+            scoreCard.className = 'score-card';
+            if (score >= 90) scoreCard.classList.add('score-excellent');
+            else if (score >= 70) scoreCard.classList.add('score-good');
+            else if (score >= 50) scoreCard.classList.add('score-fair');
+            else scoreCard.classList.add('score-poor');
+            
+            // Metrics
+            document.getElementById('metric-pages').textContent = data.totalPages || 0;
+            document.getElementById('metric-passed').textContent = data.passedChecks || 0;
+            document.getElementById('metric-critical').textContent = data.criticalIssues || 0;
+            document.getElementById('metric-high').textContent = data.highIssues || 0;
+            document.getElementById('metric-medium').textContent = data.mediumIssues || 0;
+            document.getElementById('metric-low').textContent = data.lowIssues || 0;
+            
+            // Checks
+            checksListDiv.innerHTML = '';
+            const checks = data.checks || {};
+            
+            Object.entries(checks).forEach(([key, data]) => {
+                const checkItem = document.createElement('div');
+                checkItem.className = 'check-item';
+                
+                const header = document.createElement('div');
+                header.className = 'check-header';
+                
+                const name = document.createElement('div');
+                name.className = 'check-name';
+                name.textContent = getCheckName(key);
+                
+                const status = document.createElement('div');
+                status.className = 'check-status ' + (data.passed ? 'status-passed' : 'status-failed');
+                status.textContent = data.passed ? '✅ Пройдено' : '❌ Не пройдено';
+                
+                header.appendChild(name);
+                header.appendChild(status);
+                
+                const details = document.createElement('div');
+                details.className = 'check-details';
+                details.innerHTML = getCheckDetails(key, data);
+                
+                checkItem.appendChild(header);
+                checkItem.appendChild(details);
+                checksListDiv.appendChild(checkItem);
+            });
+            
+            // Report file
+            currentReportFile = data.reportFile || '';
+        }
+
+        function getCheckName(key) {
+            const names = {
+                https: '🔒 HTTPS протокол',
+                urlStructure: '🔗 Структура URL',
+                statusCodes: '📊 Коди відповідей',
+                robotsTxt: '🤖 Robots.txt',
+                sitemap: '🗺️ Sitemap.xml',
+                wwwRedirect: '🌐 WWW редірект',
+                getParameters: '🔧 GET параметри',
+                canonicalTags: '📎 Canonical теги',
+                titles: '📝 Title теги',
+                descriptions: '📄 Meta Description',
+                h1Tags: '📌 H1 заголовки',
+                headingsHierarchy: '📚 Ієрархія заголовків',
+                imageAltTags: '🖼️ ALT атрибути',
+                openGraph: '📱 Open Graph',
+                twitterCard: '🐦 Twitter Card',
+                structuredData: '📊 Structured Data'
+            };
+            return names[key] || key;
+        }
+
+        function getCheckDetails(key, data) {
+            const details = [];
+            
+            switch(key) {
+                case 'https':
+                    details.push(data.passed ? '✅ Всі сторінки використовують HTTPS' : `❌ ${data.total - data.httpsCount} сторінок без HTTPS`);
+                    break;
+                case 'urlStructure':
+                    if (data.cyrillicUrls > 0) details.push(`⚠️ Кирилиця: ${data.cyrillicUrls}`);
+                    if (data.longUrls > 0) details.push(`⚠️ Довгі URL: ${data.longUrls}`);
+                    if (data.specialChars > 0) details.push(`⚠️ Спецсимволи: ${data.specialChars}`);
+                    if (data.passed) details.push('✅ Всі URL в нормі');
+                    break;
+                case 'statusCodes':
+                    if (data.errors4xx > 0) details.push(`❌ Помилки 4xx: ${data.errors4xx}`);
+                    if (data.errors5xx > 0) details.push(`❌ Помилки 5xx: ${data.errors5xx}`);
+                    if (data.redirects > 0) details.push(`⚠️ Редіректи 3xx: ${data.redirects}`);
+                    if (data.passed) details.push('✅ Всі коди в нормі');
+                    break;
+                default:
+                    details.push(data.passed ? '✅ Перевірка пройдена' : '❌ Знайдено проблеми');
+            }
+            
+            return details.join('<br>');
+        }
+
+        // ✅ SECURITY: Використовуємо window.electronAPI
+        async function openReport(filename) {
+            try {
+                const result = await window.electronAPI.openReport(filename);
+                if (!result.success) {
+                    showStatus('❌ Помилка відкриття звіту: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Помилка: ' + error.message, 'error');
+            }
+        }
+
+        // ✅ НОВИЙ: Експорт в Excel
+        async function exportToExcel() {
+            if (!lastAuditData) {
+                showStatus('❌ Спочатку виконайте аудит', 'error');
+                return;
+            }
+
+            try {
+                showStatus('📊 Генерація Excel файлу...', 'info');
+                
+                const result = await window.electronAPI.exportToExcel(lastAuditData);
+                
+                if (result.success) {
+                    showStatus('✅ Excel файл створено: ' + result.filename, 'success');
+                    
+                    // Пропонуємо відкрити файл
+                    setTimeout(async () => {
+                        const open = confirm('Відкрити Excel файл зараз?');
+                        if (open) {
+                            await window.electronAPI.openReport(result.filename);
+                        }
+                    }, 500);
+                } else {
+                    showStatus('❌ Помилка експорту: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Помилка: ' + error.message, 'error');
+            }
+        }
+
+        async function loadVersion() {
+            try {
+                const version = await window.electronAPI.getVersion();
+                document.getElementById('app-version').textContent = 'v' + version;
+            } catch (error) {
+                console.error('Помилка завантаження версії:', error);
+            }
+        }
+
+        // ============================================
+        // ОБРОБКА ФОРМИ
+        // ============================================
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = urlInput.value.trim();
+            
+            // Визначення глибини
+            let depth;
+            const customDepth = document.getElementById('custom-depth-input').value;
+            
+            if (customDepth) {
+                depth = parseInt(customDepth);
+                if (depth < 10 || depth > 10000) {
+                    showStatus('❌ Глибина має бути від 10 до 10,000 сторінок', 'error');
+                    return;
+                }
+            } else {
+                const selectedDepth = document.querySelector('input[name="depth"]:checked');
+                if (!selectedDepth) {
+                    showStatus('❌ Оберіть глибину сканування', 'error');
+                    return;
+                }
+                depth = parseInt(selectedDepth.value);
+            }
+
+            // ✅ SECURITY: Валідація через electronAPI
+            const validation = await window.electronAPI.validateUrl(url);
+            if (!validation.valid) {
+                showStatus('❌ ' + validation.error, 'error');
+                return;
+            }
+
+            hideStatus();
+            resultsDiv.style.display = 'none';
+            startBtn.disabled = true;
+            startBtn.textContent = 'Виконується...';
+            stopBtn.style.display = 'block';
+
+            try {
+                // ✅ SECURITY: Запуск аудиту через electronAPI
+                const result = await window.electronAPI.startAudit(url, {
+                    depth: depth,
+                    checks: {
+                        technical: checkTechnical.checked,
+                        seo: checkSeo.checked,
+                        speed: checkSpeed.checked,
+                        backlinks: checkBacklinks.checked
+                    }
+                });
+
+                startBtn.disabled = false;
+                startBtn.textContent = '🚀 Почати аудит';
+                stopBtn.style.display = 'none';
+                hideProgress();
+
+                if (result.success) {
+                    if (result.stopped) {
+                        showStatus('⚠️ Аудит зупинено користувачем', 'warning');
+                    } else {
+                        showStatus('✅ Аудит завершено успішно!', 'success');
+                        
+                        // Зберігаємо дані для Excel експорту
+                        lastAuditData = {
+                            baseUrl: url,
+                            score: result.data.score,
+                            totalPages: result.data.totalPages,
+                            checks: result.data.checks,
+                            issues: result.data.issues || [],  // ← ДОДАЙ ЦЕ!
+                            pages: result.data.pages || [], // Якщо є детальні дані сторінок
+                            reportFile: result.data.reportFile
+                        };
+                        
+                        displayResults(result.data);
+                    }
+                } else {
+                    showStatus('❌ Помилка: ' + result.error, 'error');
+                }
+            } catch (error) {
+                startBtn.disabled = false;
+                startBtn.textContent = '🚀 Почати аудит';
+                stopBtn.style.display = 'none';
+                hideProgress();
+                showStatus('❌ Помилка: ' + error.message, 'error');
+            }
+        });
+
+        // ✅ SECURITY: Зупинка через electronAPI
+        stopBtn.addEventListener('click', async () => {
+            const result = await window.electronAPI.stopAudit();
+            if (result.success) {
+                showStatus('🛑 ' + result.message, 'warning');
+            }
+        });
+
+        // ✅ SECURITY: Прогрес через electronAPI
+        window.electronAPI.onProgress((data) => {
+            showProgress(data);
+        });
+
+        // Custom depth логіка
+        const customDepthInput = document.getElementById('custom-depth-input');
+        const customDepthContainer = document.querySelector('.custom-depth');
+        
+        customDepthInput.addEventListener('input', function() {
+            if (this.value) {
+                // Знімаємо всі radio та selected класи
+                document.querySelectorAll('input[name="depth"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                document.querySelectorAll('.depth-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // ✅ Виділяємо custom depth
+                customDepthContainer.classList.add('active');
+            } else {
+                customDepthContainer.classList.remove('active');
+            }
+        });
+
+        customDepthInput.addEventListener('focus', function() {
+            if (this.value) {
+                customDepthContainer.classList.add('active');
+            }
+        });
+
+        // ✅ ВИПРАВЛЕННЯ: Додаємо/знімаємо клас selected при виборі
+        document.querySelectorAll('input[name="depth"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Очищуємо custom input
+                document.getElementById('custom-depth-input').value = '';
+                customDepthContainer.classList.remove('active');
+                
+                // Знімаємо selected з усіх карток
+                document.querySelectorAll('.depth-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Додаємо selected до обраної картки
+                this.closest('.depth-card').classList.add('selected');
+            });
+        });
+
+        // ✅ Додаємо обробники кліків на самі картки
+        document.querySelectorAll('.depth-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        // ✅ Встановлюємо selected на дефолтну опцію при завантаженні
+        window.addEventListener('DOMContentLoaded', () => {
+            loadVersion();
+            
+            // Знаходимо checked radio і додаємо selected до його картки
+            const checkedRadio = document.querySelector('input[name="depth"]:checked');
+            if (checkedRadio) {
+                checkedRadio.closest('.depth-card').classList.add('selected');
+            }
+        });
+
+        console.log('✅ SEO Audit Tool v0.6.0 готовий (Security enabled)');
+    </script>
+</body>
+</html>
