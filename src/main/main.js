@@ -104,6 +104,14 @@ ipcMain.handle('test-connection', async () => {
   };
 });
 
+// ✅ ДОДАЙ ЦЕ:
+/**
+ * Handler для отримання версії
+ */
+ipcMain.handle('get-version', async () => {
+  return { version: version };
+});
+
 /**
  * Валідація URL
  */
