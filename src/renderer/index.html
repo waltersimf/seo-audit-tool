@@ -184,69 +184,97 @@
         }
 
         .depth-options {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 15px;
         }
 
         .depth-card {
-            flex: 1;
-            padding: 20px;
+            background: #f8f9fa;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
+            padding: 20px 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: white;
+            position: relative;
         }
 
         .depth-card:hover {
             border-color: #667eea;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .depth-card.selected {
+            background: #667eea;
             border-color: #667eea;
-            background: #e8ecff;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            color: white;
+        }
+
+        .depth-card.selected .depth-title,
+        .depth-card.selected .depth-info {
+            color: white;
         }
 
         .depth-card input[type="radio"] {
-            margin-bottom: 10px;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .depth-title {
             font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
             color: #333;
-            margin-bottom: 5px;
         }
 
         .depth-info {
             font-size: 0.85rem;
             color: #666;
+            line-height: 1.4;
         }
 
         .custom-depth {
             display: flex;
-            gap: 10px;
             align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
 
-        .custom-depth input[type="number"] {
+        .custom-depth input {
             flex: 1;
+            padding: 10px;
+        }
+
+        .custom-depth label {
+            margin: 0;
+            font-weight: normal;
+            color: #666;
         }
 
         .custom-depth-note {
-            font-size: 0.85rem;
-            color: #666;
-            margin-top: 5px;
+            padding: 10px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+        }
+
+        .custom-depth-note p {
+            margin: 0;
+            color: #856404;
+            font-size: 0.9rem;
         }
 
         .checkbox-group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
 
         .checkbox-item {
@@ -254,15 +282,14 @@
             align-items: center;
             gap: 10px;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            background: #f8f9fa;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .checkbox-item:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
+            background: #e9ecef;
         }
 
         .checkbox-item input[type="checkbox"] {
@@ -274,7 +301,8 @@
         .checkbox-item label {
             margin: 0;
             cursor: pointer;
-            font-weight: 500;
+            user-select: none;
+            font-weight: normal;
         }
 
         .button-group {
@@ -282,15 +310,19 @@
             gap: 15px;
         }
 
-        .btn-primary, .btn-danger {
+        .btn-primary, .btn-danger, .btn-secondary, .btn-google-docs, .btn-google-sheets {
             flex: 1;
-            padding: 16px 32px;
+            padding: 15px 30px;
             border: none;
             border-radius: 10px;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -298,14 +330,9 @@
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn-danger {
@@ -314,239 +341,24 @@
             display: none;
         }
 
-        .btn-danger.active {
-            display: block;
-        }
-
         .btn-danger:hover {
             background: #c82333;
             transform: translateY(-2px);
-        }
-
-        .progress-container {
-            margin: 30px 0;
-            display: none;
-        }
-
-        .progress-container.active {
-            display: block;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: #e0e0e0;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            transition: width 0.3s;
-            width: 0%;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
-
-        .current-url {
-            font-size: 0.85rem;
-            color: #999;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding: 8px 12px;
-            background: #f5f5f5;
-            border-radius: 6px;
-        }
-
-        .status-message {
-            margin: 20px 0;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-weight: 500;
-            display: none;
-        }
-
-        .status-message.active {
-            display: block;
-        }
-
-        .status-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .results {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .results.active {
-            display: block;
-        }
-
-        .score-card {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .score-number {
-            font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .score-label {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .metric-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
-        .metric-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .checks-list {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-
-        .check-item {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #e0e0e0;
-        }
-
-        .check-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .check-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .check-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 1rem;
-        }
-
-        .check-status {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .status-passed {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-failed {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .check-details {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .report-actions {
-            display: flex !important;
-            gap: 15px !important;
-            margin-top: 25px !important;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
         }
 
         .btn-secondary {
-            flex: 1 !important;
-            background: #667eea !important;
-            color: white !important;
-            padding: 16px 24px !important;
-            border-radius: 10px !important;
-            border: none !important;
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
-            cursor: pointer !important;
-            transition: all 0.3s !important;
-            text-align: center !important;
+            background: #6c757d;
+            color: white;
         }
 
         .btn-secondary:hover {
-            background: #5568d3 !important;
-            transform: translateY(-2px) !important;
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(108, 117, 125, 0.4);
         }
 
-        .btn-excel {
-            background: #10b981 !important;
-            color: white !important;
-        }
-
-        .btn-excel:hover {
-            background: #059669 !important;
-        }
-
-        /* ✅ НОВИЙ: Google Docs/Sheets кнопки */
+        /* ✅ НОВИЙ: Google Docs кнопка */
         .btn-google-docs {
             background: #4285f4 !important;
             color: white !important;
@@ -556,6 +368,7 @@
             background: #357ae8 !important;
         }
 
+        /* ✅ НОВИЙ: Google Sheets кнопка */
         .btn-google-sheets {
             background: #0f9d58 !important;
             color: white !important;
@@ -571,6 +384,192 @@
             transform: none !important;
         }
 
+        .progress-container {
+            display: none;
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .current-url {
+            color: #999;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-message {
+            display: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .checks-list {
+            margin-top: 20px;
+        }
+
+        .check-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+
+        .check-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .check-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .check-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .check-details {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .check-details ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .check-details li {
+            margin: 5px 0;
+        }
+
+        .report-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .excel-export-btn {
+            margin-top: 0px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -581,7 +580,7 @@
             }
 
             .depth-options {
-                flex-direction: column;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .button-group {
@@ -605,10 +604,6 @@
             .google-auth-info {
                 flex-direction: column;
             }
-        }
-
-        .excel-export-btn {
-            margin-top: 0px;
         }
     </style>
 </head>
@@ -797,11 +792,12 @@
                 <button class="btn-secondary btn-excel excel-export-btn" onclick="exportToExcel()">
                     📊 Експорт в Excel
                 </button>
-                <!-- ✅ НОВИЙ: Google Docs/Sheets кнопки -->
-                <button class="btn-secondary btn-google-docs" id="export-google-docs-btn" onclick="exportToGoogleDocs()">
+                <!-- ✅ НОВИЙ: Google Docs кнопка -->
+                <button class="btn-secondary btn-google-docs" id="google-docs-btn" onclick="exportToGoogleDocs()" style="display: none;">
                     📄 Експорт в Google Docs
                 </button>
-                <button class="btn-secondary btn-google-sheets" id="export-google-sheets-btn" onclick="exportToGoogleSheets()">
+                <!-- ✅ НОВИЙ: Google Sheets кнопка -->
+                <button class="btn-secondary btn-google-sheets" id="google-sheets-btn" onclick="exportToGoogleSheets()" style="display: none;">
                     📊 Експорт в Google Sheets
                 </button>
             </div>
@@ -812,230 +808,314 @@
         // ============================================
         // ЗМІННІ
         // ============================================
-        
-        const form = document.getElementById('audit-form');
-        const urlInput = document.getElementById('url-input');
-        const startBtn = document.getElementById('start-btn');
-        const stopBtn = document.getElementById('stop-btn');
-        const progressContainer = document.getElementById('progress-container');
-        const progressFill = document.getElementById('progress-fill');
-        const progressText = document.getElementById('progress-text');
-        const progressCount = document.getElementById('progress-count');
-        const currentUrlDiv = document.getElementById('current-url');
-        const statusMessage = document.getElementById('status-message');
-        const results = document.getElementById('results');
-        
-        let lastAuditData = null;
         let currentReportFile = '';
-        let isGoogleAuthorized = false;
+        let lastAuditData = null;
 
         // ============================================
-        // ✅ НОВИЙ: GOOGLE AUTH FUNCTIONS
+        // DEPTH CARDS - Interactive Selection
         // ============================================
-
-        async function checkGoogleAuth() {
-            try {
-                const status = await window.electronAPI.googleAuthStatus();
-                
-                if (status.isAuthorized && status.user) {
-                    isGoogleAuthorized = true;
-                    document.getElementById('google-status-title').innerHTML = 
-                        '<span class="google-status-connected">✅ Підключено</span>';
-                    document.getElementById('google-status-email').textContent = status.user.email;
-                    document.getElementById('google-login-btn').style.display = 'none';
-                    document.getElementById('google-logout-btn').style.display = 'flex';
-                    
-                    // Активуємо Google кнопки якщо є дані аудиту
-                    if (lastAuditData) {
-                        document.getElementById('export-google-docs-btn').disabled = false;
-                        document.getElementById('export-google-sheets-btn').disabled = false;
-                    }
-                } else {
-                    isGoogleAuthorized = false;
-                    document.getElementById('google-status-title').innerHTML = 
-                        '<span class="google-status-disconnected">❌ Не підключено</span>';
-                    document.getElementById('google-status-email').textContent = 
-                        'Підключіть Google Account для експорту в Docs/Sheets';
-                    document.getElementById('google-login-btn').style.display = 'flex';
-                    document.getElementById('google-logout-btn').style.display = 'none';
-                    
-                    // Деактивуємо Google кнопки
-                    document.getElementById('export-google-docs-btn').disabled = true;
-                    document.getElementById('export-google-sheets-btn').disabled = true;
-                }
-            } catch (error) {
-                console.error('Помилка перевірки статусу Google:', error);
-            }
-        }
-
-        async function googleLogin() {
-            const btn = document.getElementById('google-login-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Авторизація...';
-            
-            try {
-                const result = await window.electronAPI.googleAuthLogin();
-                
-                if (result.success) {
-                    showStatus('✅ Успішно підключено до Google Account!', 'success');
-                    await checkGoogleAuth();
-                } else {
-                    showStatus('❌ Помилка авторизації: ' + result.error, 'error');
-                }
-            } catch (error) {
-                showStatus('❌ Помилка: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🔐 Підключити';
-            }
-        }
-
-        async function googleLogout() {
-            if (!confirm('Ви впевнені що хочете вийти з Google Account?')) {
-                return;
-            }
-            
-            const btn = document.getElementById('google-logout-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Вихід...';
-            
-            try {
-                const result = await window.electronAPI.googleAuthLogout();
-                
-                if (result.success) {
-                    showStatus('✅ Вийшли з Google Account', 'success');
-                    await checkGoogleAuth();
-                } else {
-                    showStatus('❌ Помилка виходу: ' + result.error, 'error');
-                }
-            } catch (error) {
-                showStatus('❌ Помилка: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🚪 Вийти';
-            }
-        }
-
-        async function exportToGoogleDocs() {
-            if (!lastAuditData) {
-                showStatus('❌ Спочатку проведіть аудит!', 'error');
-                return;
-            }
-            
-            if (!isGoogleAuthorized) {
-                showStatus('❌ Спочатку підключіть Google Account!', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('export-google-docs-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Створення...';
-            
-            try {
-                const result = await window.electronAPI.exportGoogleDocs(lastAuditData);
-                if (result.success) {
-                    if (confirm('✅ Google Docs створено!\n\nВідкрити зараз?')) {
-                        window.open(result.url, '_blank');
-                    }
-                } else {
-                    alert('❌ Помилка: ' + result.error);
-                }
-            } catch (error) {
-                alert('❌ Помилка: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '📄 Експорт в Google Docs';
-            }
-        }
-
-        async function exportToGoogleSheets() {
-            if (!lastAuditData) {
-                showStatus('❌ Спочатку проведіть аудит!', 'error');
-                return;
-            }
-            
-            if (!isGoogleAuthorized) {
-                showStatus('❌ Спочатку підключіть Google Account!', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('export-google-sheets-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Створення...';
-            
-            try {
-                const result = await window.electronAPI.exportGoogleSheets(lastAuditData);
-                if (result.success) {
-                    if (confirm('✅ Google Sheets створено!\n\nВідкрити зараз?')) {
-                        window.open(result.url, '_blank');
-                    }
-                } else {
-                    alert('❌ Помилка: ' + result.error);
-                }
-            } catch (error) {
-                alert('❌ Помилка: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '📊 Експорт в Google Sheets';
-            }
-        }
-
-        // ============================================
-        // DEPTH CARDS LOGIC
-        // ============================================
-
         document.querySelectorAll('.depth-card').forEach(card => {
             card.addEventListener('click', function() {
-                // Знімаємо selected з усіх карток
+                // Remove selected class from all cards
                 document.querySelectorAll('.depth-card').forEach(c => c.classList.remove('selected'));
-                
-                // Додаємо selected до поточної
+                // Add selected class to clicked card
                 this.classList.add('selected');
-                
-                // Вибираємо відповідний radio
+                // Check the radio button
                 const radio = this.querySelector('input[type="radio"]');
-                if (radio) {
-                    radio.checked = true;
-                }
-                
-                // Очищуємо custom depth
+                if (radio) radio.checked = true;
+                // Clear custom depth if preset is selected
                 document.getElementById('custom-depth').value = '';
             });
         });
 
-        // Custom depth - при введенні знімаємо виділення з карток та radio
+        // Custom depth field handling
         document.getElementById('custom-depth').addEventListener('input', function() {
             if (this.value) {
+                // Remove selected from all preset cards
                 document.querySelectorAll('.depth-card').forEach(c => c.classList.remove('selected'));
+                // Uncheck all radios
                 document.querySelectorAll('input[name="depth"]').forEach(r => r.checked = false);
             }
         });
 
         // ============================================
-        // UTILITY FUNCTIONS
+        // ✅ НОВИЙ: Google Auth Functions
         // ============================================
 
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message active ${type}`;
+        // Перевірка статусу авторизації при завантаженні
+        async function checkGoogleAuthStatus() {
+            try {
+                const status = await window.electronAPI.invoke('google-check-auth');
+                updateGoogleUI(status);
+            } catch (error) {
+                console.error('Помилка перевірки Google auth:', error);
+            }
+        }
+
+        // Оновлення UI Google секції
+        function updateGoogleUI(status) {
+            const titleEl = document.getElementById('google-status-title');
+            const emailEl = document.getElementById('google-status-email');
+            const loginBtn = document.getElementById('google-login-btn');
+            const logoutBtn = document.getElementById('google-logout-btn');
+            const docsBtn = document.getElementById('google-docs-btn');
+            const sheetsBtn = document.getElementById('google-sheets-btn');
+
+            if (status.authenticated) {
+                // Авторизований
+                titleEl.textContent = 'Google Account';
+                emailEl.textContent = status.email || 'Підключено ✅';
+                emailEl.className = 'google-status-email google-status-connected';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'flex';
+                
+                // Показати Google кнопки експорту якщо є дані аудиту
+                if (lastAuditData) {
+                    docsBtn.style.display = 'flex';
+                    sheetsBtn.style.display = 'flex';
+                }
+            } else {
+                // Не авторизований
+                titleEl.textContent = 'Google Account';
+                emailEl.textContent = 'Не підключено';
+                emailEl.className = 'google-status-email google-status-disconnected';
+                loginBtn.style.display = 'flex';
+                logoutBtn.style.display = 'none';
+                docsBtn.style.display = 'none';
+                sheetsBtn.style.display = 'none';
+            }
+        }
+
+        // Логін в Google
+        async function googleLogin() {
+            const loginBtn = document.getElementById('google-login-btn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Авторизація...';
+
+            try {
+                const result = await window.electronAPI.invoke('google-login');
+                
+                if (result.success) {
+                    showToast('✅ Google авторизація успішна!', 'success');
+                    updateGoogleUI({ authenticated: true, email: result.email });
+                } else {
+                    showToast('❌ Помилка авторизації: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google login:', error);
+                showToast('❌ Помилка підключення до Google', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Підключити';
+            }
+        }
+
+        // Логаут з Google
+        async function googleLogout() {
+            try {
+                await window.electronAPI.invoke('google-logout');
+                showToast('👋 Вихід з Google Account', 'success');
+                updateGoogleUI({ authenticated: false });
+            } catch (error) {
+                console.error('Помилка Google logout:', error);
+                showToast('❌ Помилка виходу', 'error');
+            }
+        }
+
+        // Експорт в Google Docs
+        async function exportToGoogleDocs() {
+            if (!lastAuditData) {
+                showToast('❌ Немає даних для експорту', 'error');
+                return;
+            }
+
+            const docsBtn = document.getElementById('google-docs-btn');
+            docsBtn.disabled = true;
+            docsBtn.textContent = '⏳ Створюємо документ...';
+
+            try {
+                const result = await window.electronAPI.invoke('export-google-docs', lastAuditData);
+                
+                if (result.success) {
+                    showToast('✅ Google Docs створено!', 'success');
+                    // Відкрити документ в браузері
+                    await window.electronAPI.invoke('open-url', result.url);
+                } else {
+                    showToast('❌ Помилка створення документа: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google Docs export:', error);
+                showToast('❌ Помилка експорту в Google Docs', 'error');
+            } finally {
+                docsBtn.disabled = false;
+                docsBtn.textContent = '📄 Експорт в Google Docs';
+            }
+        }
+
+        // Експорт в Google Sheets
+        async function exportToGoogleSheets() {
+            if (!lastAuditData) {
+                showToast('❌ Немає даних для експорту', 'error');
+                return;
+            }
+
+            const sheetsBtn = document.getElementById('google-sheets-btn');
+            sheetsBtn.disabled = true;
+            sheetsBtn.textContent = '⏳ Створюємо таблицю...';
+
+            try {
+                const result = await window.electronAPI.invoke('export-google-sheets', lastAuditData);
+                
+                if (result.success) {
+                    showToast('✅ Google Sheets створено!', 'success');
+                    // Відкрити таблицю в браузері
+                    await window.electronAPI.invoke('open-url', result.url);
+                } else {
+                    showToast('❌ Помилка створення таблиці: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google Sheets export:', error);
+                showToast('❌ Помилка експорту в Google Sheets', 'error');
+            } finally {
+                sheetsBtn.disabled = false;
+                sheetsBtn.textContent = '📊 Експорт в Google Sheets';
+            }
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                border-radius: 5px;
+                z-index: 9999;
+                animation: slideIn 0.3s;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
             
-            setTimeout(() => {
-                statusMessage.classList.remove('active');
-            }, 5000);
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        function updateProgress(current, total, currentUrl) {
-            const percent = Math.round((current / total) * 100);
-            progressFill.style.width = `${percent}%`;
-            progressFill.textContent = `${percent}%`;
-            progressCount.textContent = `${current} / ${total}`;
-            currentUrlDiv.textContent = currentUrl || 'Очікування...';
-        }
+        // ============================================
+        // FORM SUBMIT - Start Audit
+        // ============================================
+        document.getElementById('audit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('url-input').value.trim();
+            const customDepth = document.getElementById('custom-depth').value;
+            const selectedDepth = customDepth || document.querySelector('input[name="depth"]:checked')?.value || 500;
+            
+            const checks = {
+                technical: document.getElementById('check-technical').checked,
+                seo: document.getElementById('check-seo').checked,
+                speed: document.getElementById('check-speed').checked,
+                backlinks: document.getElementById('check-backlinks').checked
+            };
 
+            // Hide form, show progress
+            document.getElementById('audit-form').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'block';
+            document.getElementById('progress-container').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                await window.electronAPI.invoke('start-audit', {
+                    url,
+                    maxPages: parseInt(selectedDepth),
+                    checks
+                });
+            } catch (error) {
+                console.error('Error starting audit:', error);
+                showStatus('❌ Помилка запуску аудиту', 'error');
+            }
+        });
+
+        // ============================================
+        // STOP BUTTON
+        // ============================================
+        document.getElementById('stop-btn').addEventListener('click', async () => {
+            try {
+                await window.electronAPI.invoke('stop-audit');
+                showStatus('⏸️ Аудит зупинено', 'error');
+                resetUI();
+            } catch (error) {
+                console.error('Error stopping audit:', error);
+            }
+        });
+
+        // ============================================
+        // PROGRESS UPDATES
+        // ============================================
+        window.electronAPI.onProgress((event, data) => {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const progressCount = document.getElementById('progress-count');
+            const currentUrl = document.getElementById('current-url');
+
+            const percentage = Math.round((data.current / data.total) * 100);
+            progressFill.style.width = `${percentage}%`;
+            progressFill.textContent = `${percentage}%`;
+            progressText.textContent = data.status;
+            progressCount.textContent = `${data.current} / ${data.total}`;
+            
+            if (data.currentUrl) {
+                currentUrl.textContent = `Сканується: ${data.currentUrl}`;
+            }
+        });
+
+        // ============================================
+        // AUDIT COMPLETE
+        // ============================================
+        window.electronAPI.onAuditComplete((event, data) => {
+            console.log('Audit complete:', data);
+            
+            // Save audit data for export
+            lastAuditData = data;
+            
+            // Show results
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            showStatus('✅ Аудит завершено!', 'success');
+            
+            // Update UI
+            displayResults(data);
+            
+            // Reset form
+            document.getElementById('audit-form').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('stop-btn').style.display = 'none';
+
+            // ✅ НОВИЙ: Показати Google кнопки якщо авторизовані
+            checkGoogleAuthStatus();
+        });
+
+        // ============================================
+        // DISPLAY RESULTS
+        // ============================================
         function displayResults(data) {
             // Score
-            document.getElementById('score-number').textContent = data.score || 0;
+            const scoreNumber = document.getElementById('score-number');
+            const scoreCard = document.getElementById('score-card');
+            scoreNumber.textContent = data.score || 0;
             
+            // Color based on score
+            if (data.score >= 80) {
+                scoreCard.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+            } else if (data.score >= 50) {
+                scoreCard.style.background = 'linear-gradient(135deg, #f09819 0%, #edde5d 100%)';
+            } else {
+                scoreCard.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+            }
+
             // Metrics
             document.getElementById('metric-pages').textContent = data.totalPages || 0;
             document.getElementById('metric-passed').textContent = data.passedChecks || 0;
@@ -1043,17 +1123,12 @@
             document.getElementById('metric-high').textContent = data.highIssues || 0;
             document.getElementById('metric-medium').textContent = data.mediumIssues || 0;
             document.getElementById('metric-low').textContent = data.lowIssues || 0;
-            
-            // Checks list
+
+            // Checks
             const checksListDiv = document.getElementById('checks-list');
             checksListDiv.innerHTML = '';
             
-            if (!data.checks) {
-                checksListDiv.innerHTML = '<p>Немає даних перевірок</p>';
-                return;
-            }
-            
-            Object.entries(data.checks).forEach(([key, data]) => {
+            Object.entries(data.checks || {}).forEach(([key, data]) => {
                 const checkItem = document.createElement('div');
                 checkItem.className = 'check-item';
                 
@@ -1129,164 +1204,69 @@
                     details.push(data.passed ? '✅ Перевірка пройдена' : '❌ Знайдено проблеми');
             }
             
-            return details.join('<br>');
+            return details.length > 0 ? details.join('<br>') : 'Немає деталей';
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type === 'success' ? 'status-success' : 'status-error'}`;
+            statusEl.style.display = 'block';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function resetUI() {
+            document.getElementById('audit-form').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('stop-btn').style.display = 'none';
+            document.getElementById('progress-container').style.display = 'none';
         }
 
         async function openReport(filename) {
+            if (!filename) {
+                showStatus('❌ Файл звіту не знайдено', 'error');
+                return;
+            }
+            
             try {
-                const result = await window.electronAPI.openReport(filename);
-                if (!result.success) {
-                    showStatus('❌ Помилка відкриття звіту: ' + result.error, 'error');
-                }
+                await window.electronAPI.invoke('open-report', filename);
             } catch (error) {
-                showStatus('❌ Помилка: ' + error.message, 'error');
+                console.error('Error opening report:', error);
+                showStatus('❌ Помилка відкриття звіту', 'error');
             }
         }
 
         async function exportToExcel() {
             if (!lastAuditData) {
-                showStatus('❌ Спочатку виконайте аудит', 'error');
+                showStatus('❌ Немає даних для експорту', 'error');
                 return;
             }
 
             try {
-                showStatus('📊 Генерація Excel файлу...', 'info');
-                
-                const result = await window.electronAPI.exportToExcel(lastAuditData);
-                
+                const result = await window.electronAPI.invoke('export-excel', lastAuditData);
                 if (result.success) {
-                    showStatus('✅ Excel файл створено: ' + result.filename, 'success');
-                    
-                    setTimeout(async () => {
-                        const open = confirm('Відкрити Excel файл зараз?');
-                        if (open) {
-                            await window.electronAPI.openReport(result.filename);
-                        }
-                    }, 500);
+                    showStatus('✅ Excel файл створено!', 'success');
                 } else {
-                    showStatus('❌ Помилка експорту: ' + result.error, 'error');
+                    showStatus('❌ Помилка створення Excel: ' + result.error, 'error');
                 }
             } catch (error) {
-                showStatus('❌ Помилка: ' + error.message, 'error');
+                console.error('Error exporting to Excel:', error);
+                showStatus('❌ Помилка експорту в Excel', 'error');
             }
         }
-
-        async function loadVersion() {
-            try {
-                const version = await window.electronAPI.getVersion();
-                document.getElementById('app-version').textContent = 'v' + version;
-            } catch (error) {
-                console.error('Помилка завантаження версії:', error);
-            }
-        }
-
-        // ============================================
-        // FORM SUBMISSION
-        // ============================================
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const url = urlInput.value.trim();
-            
-            // Validate URL
-            if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                showStatus('❌ URL має починатися з http:// або https://', 'error');
-                return;
-            }
-
-            // Get depth
-            let maxPages;
-            const customDepth = document.getElementById('custom-depth').value;
-            
-            if (customDepth) {
-                maxPages = parseInt(customDepth);
-                if (maxPages < 1 || maxPages > 10000) {
-                    showStatus('❌ Глибина має бути від 1 до 10,000', 'error');
-                    return;
-                }
-            } else {
-                const selectedDepth = document.querySelector('input[name="depth"]:checked');
-                if (!selectedDepth) {
-                    showStatus('❌ Оберіть глибину сканування', 'error');
-                    return;
-                }
-                maxPages = parseInt(selectedDepth.value);
-            }
-
-            // Get check types
-            const checks = {
-                technical: document.getElementById('check-technical').checked,
-                seo: document.getElementById('check-seo').checked,
-                speed: document.getElementById('check-speed').checked,
-                backlinks: document.getElementById('check-backlinks').checked
-            };
-
-            // UI updates
-            startBtn.disabled = true;
-            stopBtn.classList.add('active');
-            progressContainer.classList.add('active');
-            results.classList.remove('active');
-            statusMessage.classList.remove('active');
-            
-            try {
-                const result = await window.electronAPI.startAudit({ url, maxPages, checks });
-                
-                if (result.success) {
-                    showStatus('✅ Аудит завершено!', 'success');
-                } else {
-                    showStatus('❌ Помилка: ' + result.error, 'error');
-                }
-            } catch (error) {
-                showStatus('❌ Помилка: ' + error.message, 'error');
-            } finally {
-                startBtn.disabled = false;
-                stopBtn.classList.remove('active');
-                progressContainer.classList.remove('active');
-            }
-        });
-
-        // ============================================
-        // STOP BUTTON
-        // ============================================
-
-        stopBtn.addEventListener('click', async () => {
-            if (confirm('Зупинити аудит?')) {
-                try {
-                    await window.electronAPI.stopAudit();
-                    showStatus('🛑 Аудит зупинено', 'info');
-                } catch (error) {
-                    showStatus('❌ Помилка: ' + error.message, 'error');
-                }
-            }
-        });
-
-        // ============================================
-        // IPC LISTENERS
-        // ============================================
-
-        window.electronAPI.onProgressUpdate((data) => {
-            progressText.textContent = data.status;
-            updateProgress(data.current, data.total, data.currentUrl);
-        });
-
-        window.electronAPI.onAuditComplete((data) => {
-            console.log('✅ Аудит завершено, дані:', data);
-            
-            lastAuditData = data;
-            displayResults(data);
-            results.classList.add('active');
-            
-            // Перевірити Google auth статус
-            checkGoogleAuth();
-        });
 
         // ============================================
         // INITIALIZATION
         // ============================================
-
-        loadVersion();
-        checkGoogleAuth();
+        
+        // Перевірити Google auth статус при завантаженні
+        checkGoogleAuthStatus();
     </script>
 </body>
 </html>

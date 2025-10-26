@@ -1,7 +1,7 @@
 // ============================================
 // PRELOAD.JS - Безпечний міст між процесами
 // ============================================
-// Версія: v0.7.0 - Google Docs/Sheets
+// Версія: v0.7.0 - Google Docs/Sheets (Підхід 2)
 // Призначення: Експонує безпечні API для renderer
 // ============================================
 
@@ -17,16 +17,30 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AUDIT OPERATIONS
   // ============================================
   
-  startAudit: (url, options) => {
-    return ipcRenderer.invoke('start-audit', url, options);
-  },
-
-  stopAudit: () => {
-    return ipcRenderer.invoke('stop-audit');
-  },
-
-  validateUrl: (url) => {
-    return ipcRenderer.invoke('validate-url', url);
+  invoke: (channel, ...args) => {
+    // Дозволені канали
+    const validChannels = [
+      'start-audit',
+      'stop-audit',
+      'validate-url',
+      'open-report',
+      'open-reports-folder',
+      'export-excel',
+      'google-save-credentials',
+      'google-check-credentials',
+      'google-check-auth',
+      'google-login',
+      'google-logout',
+      'export-google-docs',
+      'export-google-sheets',
+      'open-url',
+      'test-connection',
+      'get-version'
+    ];
+    
+    if (validChannels.includes(channel)) {
+      return ipcRenderer.invoke(channel, ...args);
+    }
   },
 
   // ============================================
@@ -35,73 +49,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   onProgress: (callback) => {
     ipcRenderer.on('audit-progress', (event, data) => {
-      callback(data);
+      callback(event, data);
     });
   },
 
-  removeProgressListener: () => {
-    ipcRenderer.removeAllListeners('audit-progress');
+  onAuditComplete: (callback) => {
+    ipcRenderer.on('audit-complete', (event, data) => {
+      callback(event, data);
+    });
   },
 
-  // ============================================
-  // REPORT OPERATIONS
-  // ============================================
-  
-  openReport: (filename) => {
-    return ipcRenderer.invoke('open-report', filename);
-  },
-
-  openReportsFolder: () => {
-    return ipcRenderer.invoke('open-reports-folder');
-  },
-
-  exportToExcel: (auditData, filename) => {
-    return ipcRenderer.invoke('export-to-excel', auditData, filename);
-  },
-
-  openExcelReport: (filename) => {
-    return ipcRenderer.invoke('open-report', filename);
-  },
-
-  // ============================================
-  // ✅ НОВИЙ: GOOGLE AUTH
-  // ============================================
-  
-  googleAuthStatus: () => {
-    return ipcRenderer.invoke('google-auth-status');
-  },
-
-  googleAuthLogin: () => {
-    return ipcRenderer.invoke('google-auth-login');
-  },
-
-  googleAuthLogout: () => {
-    return ipcRenderer.invoke('google-auth-logout');
-  },
-
-  // ============================================
-  // ✅ НОВИЙ: GOOGLE EXPORT
-  // ============================================
-  
-  exportGoogleSheets: (auditData) => {
-    return ipcRenderer.invoke('export-google-sheets', auditData);
-  },
-
-  exportGoogleDocs: (auditData) => {
-    return ipcRenderer.invoke('export-google-docs', auditData);
-  },
-
-  // ============================================
-  // TESTING & INFO
-  // ============================================
-  
-  testConnection: () => {
-    return ipcRenderer.invoke('test-connection');
-  },
-
-  getVersion: () => {
-    return ipcRenderer.invoke('get-version');
+  removeAllListeners: (channel) => {
+    ipcRenderer.removeAllListeners(channel);
   }
 });
 
-console.log('✅ Preload script завантажено (v0.7.0 - Google Docs/Sheets)');
+console.log('✅ Preload script завантажено (v0.7.0 - Google with Credentials)');
