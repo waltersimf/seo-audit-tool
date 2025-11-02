@@ -812,6 +812,157 @@
         let lastAuditData = null;
 
         // ============================================
+        // ✅ НОВИЙ: GOOGLE AUTH ФУНКЦІЇ
+        // ============================================
+
+        // Перевірити статус Google авторизації
+        async function checkGoogleAuthStatus() {
+            try {
+                const status = await window.electronAPI.invoke('google-auth-status');
+                updateGoogleUI(status);
+            } catch (error) {
+                console.error('Помилка перевірки Google auth:', error);
+                updateGoogleUI({ isAuthorized: false });
+            }
+        }
+
+        // Оновити UI з статусом Google
+        function updateGoogleUI(status) {
+            const titleEl = document.querySelector('.google-status-title');
+            const emailEl = document.querySelector('.google-status-email');
+            const loginBtn = document.getElementById('google-login-btn');
+            const logoutBtn = document.getElementById('google-logout-btn');
+            const docsBtn = document.getElementById('google-docs-btn');
+            const sheetsBtn = document.getElementById('google-sheets-btn');
+
+            if (status.isAuthorized) {
+                // Авторизований
+                titleEl.textContent = 'Google Account';
+                emailEl.textContent = status.user?.email || 'Підключено ✅';
+                emailEl.className = 'google-status-email google-status-connected';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'flex';
+                
+                // Показати Google кнопки експорту якщо є дані аудиту
+                if (lastAuditData) {
+                    docsBtn.style.display = 'flex';
+                    sheetsBtn.style.display = 'flex';
+                }
+            } else {
+                // Не авторизований
+                titleEl.textContent = 'Google Account';
+                emailEl.textContent = 'Не підключено';
+                emailEl.className = 'google-status-email google-status-disconnected';
+                loginBtn.style.display = 'flex';
+                logoutBtn.style.display = 'none';
+                docsBtn.style.display = 'none';
+                sheetsBtn.style.display = 'none';
+            }
+        }
+
+        // Логін в Google
+        async function googleLogin() {
+            const loginBtn = document.getElementById('google-login-btn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Авторизація...';
+
+            try {
+                const result = await window.electronAPI.invoke('google-auth-login');
+                
+                if (result.success) {
+                    showToast('✅ Google авторизація успішна!', 'success');
+                    updateGoogleUI({ isAuthorized: true, user: result.user });
+                } else {
+                    showToast('❌ Помилка авторизації: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google login:', error);
+                showToast('❌ Помилка підключення до Google', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Підключити';
+            }
+        }
+
+        // Логаут з Google
+        async function googleLogout() {
+            try {
+                await window.electronAPI.invoke('google-auth-logout');
+                showToast('👋 Вихід з Google Account', 'success');
+                updateGoogleUI({ isAuthorized: false });
+            } catch (error) {
+                console.error('Помилка Google logout:', error);
+                showToast('❌ Помилка виходу', 'error');
+            }
+        }
+
+        // Експорт в Google Docs
+        async function exportToGoogleDocs() {
+            if (!lastAuditData) {
+                showToast('❌ Немає даних для експорту', 'error');
+                return;
+            }
+
+            const docsBtn = document.getElementById('google-docs-btn');
+            docsBtn.disabled = true;
+            docsBtn.textContent = '⏳ Створюємо документ...';
+
+            try {
+                const result = await window.electronAPI.invoke('export-google-docs', lastAuditData);
+                
+                if (result.success) {
+                    showToast('✅ Google Docs створено!', 'success');
+                    // Відкрити документ в браузері
+                    window.electronAPI.invoke('open-url', result.url);
+                } else {
+                    showToast('❌ Помилка створення документа: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google Docs export:', error);
+                showToast('❌ Помилка експорту в Google Docs', 'error');
+            } finally {
+                docsBtn.disabled = false;
+                docsBtn.textContent = '📄 Експорт в Google Docs';
+            }
+        }
+
+        // Експорт в Google Sheets
+        async function exportToGoogleSheets() {
+            if (!lastAuditData) {
+                showToast('❌ Немає даних для експорту', 'error');
+                return;
+            }
+
+            const sheetsBtn = document.getElementById('google-sheets-btn');
+            sheetsBtn.disabled = true;
+            sheetsBtn.textContent = '⏳ Створюємо таблицю...';
+
+            try {
+                const result = await window.electronAPI.invoke('export-google-sheets', lastAuditData);
+                
+                if (result.success) {
+                    showToast('✅ Google Sheets створено!', 'success');
+                    // Відкрити таблицю в браузері
+                    window.electronAPI.invoke('open-url', result.url);
+                } else {
+                    showToast('❌ Помилка створення таблиці: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Помилка Google Sheets export:', error);
+                showToast('❌ Помилка експорту в Google Sheets', 'error');
+            } finally {
+                sheetsBtn.disabled = false;
+                sheetsBtn.textContent = '📊 Експорт в Google Sheets';
+            }
+        }
+
+        // Показати toast повідомлення
+        function showToast(message, type = 'info') {
+            showStatus(message, type);
+        }
+
+
+        // ============================================
         // DEPTH CARDS - Interactive Selection
         // ============================================
         document.querySelectorAll('.depth-card').forEach(card => {
